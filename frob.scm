@@ -3,20 +3,25 @@
 
 (define (now)
   (define now (current-time 'time-monotonic))
-  (+ (fx* (time-second now) 1000)
-     (fx/ (time-nanosecond now) 1000000)))
+  (fx+ (fx* (time-second now) (expt 10 3))
+       (fx/ (time-nanosecond now) (expt 10 6))))
 
 
 (define libfrob (load-shared-object "./libfrob.so"))
 
-(define frob (foreign-procedure __collect_safe "frob" (int) int))
+(define frob (foreign-procedure "frob" (int) int))
 
+(define i (string->number (cadr (command-line))))
 
 (define start (now))
 
-(let loop ((i (string->number (cadr (command-line))))
-           (x 0))
-  (unless (fxzero? i)
-    (loop (fx- i 1) (frob x))))
+(define x (let loop ((i i)
+                     (x 0))
+            (if (fxzero? i)
+                x
+                (loop (fx- i 1) (frob x)))))
 
-(display (fx- (now) start)) (newline)
+(display "out: Chez C FFI wall-clock time: ")
+(display (- (now) start))
+(newline)
+(format #t "out: ~a\n" x)

@@ -16,7 +16,7 @@ ffibuilder.set_source("_libfrob_cffi",
 """
      #include "libfrob.h"   // the C header of the library
 """,
-     libraries=['./libfrob'])   # library name, for the linker
+     libraries=['./libfrob.so'])   # library name, for the linker
 
 if __name__ == "__main__":
     ffibuilder.compile(verbose=True)
